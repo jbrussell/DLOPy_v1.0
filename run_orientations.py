@@ -1,17 +1,13 @@
-
-# coding: utf-8
-
+# %% markdown
 # # Orient instruments using Rayleigh waves
 # Jupyter Notebook wrapper for the DLOPy_v1.0 codes. This package reads in event data directly from the IRIS database, so no need to worry about data formatting. By default, it assumes H2 is 90$^\circ$ CW from H1 with Z pointing up (left handed system). It uses global dispersion maps to predict the Rayleigh-wave arrival window. The cross-correlations are preformed in seven frequency bands ranging from 10 to 40 mHz (25-100 s).
 # 
 # ### The output angle is the clockwise rotation in degrees from geographic North of the nominally north component (H1).
 # 
-# 
 # #### JBR - 2/5/18 Modified to allow looping through all stations in a network (set singlesta=0).
-
-# In[1]:
-
-
+#
+# %% codecell
+# -*- coding: utf-8 -*-
 """
 PRIMARY ORIENTATION PROGRAM
 ADRIAN. K. DORAN
@@ -23,15 +19,13 @@ RELEASED APRIL 2017
 #########################
 # Import necessary packages, functions, and parameter files
 # from Orient_PF import *
-from locfuns import *
+from pysave.locfuns import *
 from numpy import *
 import os
-from obspy.fdsn import Client
+from obspy.clients.fdsn import Client
+import pandas as pd
+%matplotlib inline
 #########################
-
-
-# In[2]:
-
 """
 Parameter file for Orient
 A. Doran and G. Laske
@@ -43,11 +37,9 @@ A. Doran and G. Laske
 # STATION INFO
 # ------------
 # NETWORK CODE
-NET="ZA" #"ZA"      
+NET="ZA"
 # STATION NAME  
-singlesta=0
-if singlesta==0:
-    STA="B02" #"B02"
+STA=["B01","B02"] # "*" for all stations
 # CHANNELS TO ORIENT 
 CHA="BH?" #"BH?"     
 # CHANNEL LOCATION  
@@ -60,7 +52,9 @@ LOC="*"
 localdata=0
 if localdata==1:
     from readlocal import *
+    path2msd='/path/to/local/mseed/data/'
     LF=getmsd1
+    # LF=getmsd2
 ####
 ##    
 ####
@@ -68,8 +62,18 @@ if localdata==1:
 # If want to input own station lat and lon 
 localcoords=0
 if localcoords==1:
-    inputlat=32.533617
-    inputlon=-120.49978    
+    
+    # Load station file
+    path2sta = "/Users/russell/Lamont/PROJ_YoungPacificORCA/DATA/STATION_PLOTS/stations_recovered9.txt" # station file
+    
+    inventory = pd.read_csv(path2sta, delimiter= '\s+', index_col=False, names=['station','stla','stlo','stel'])    
+    stala = inventory['stla']
+    stalo = inventory['stlo']
+    STAS = inventory['station']
+elif localcoords==0:
+    client = Client(wf_client)
+    inventory = client.get_stations(network=NET, station=",".join(STA),channel=CHA, starttime=time1, endtime=time2)
+    STAS = [x.code for x in inventory[0].stations]
 
 ####
 ##
@@ -125,24 +129,15 @@ savecat=1
 # 0 - no
 # 1 - yes
 
-if singlesta==0:
-    client = Client(wf_client)
-    inventory = client.get_stations(network=NET, station='*',channel=CHA, starttime=time1, endtime=time2)
-    STAS = [x.code for x in inventory[0].stations]
-else:
-    STAS=[STA]
-STAS
-
-
-# In[3]:
-
 # Resume from a previous station?
 isresume = 0
 STA_resume = 'B01'
+# %% codecell
 
-
-# In[4]:
-
+STAS
+# %% markdown
+# # DO NOT EDIT BELOW THIS POINT
+# %% codecell
 # Define variables using param file inputs1
 client1=Client(cat_client)      # Catalog Client
 client2=Client(wf_client)     # Waveform Client
@@ -164,8 +159,8 @@ for iSTA, STA in enumerate(STAS):
 
     # get station info
     if localdata==1 or localcoords==1:
-        sta_lat=inputlat
-        sta_lon=inputlon
+        sta_lat=stala[iSTA]
+        sta_lon=stalo[iSTA]
     else:
         # Get station and event data
         inv=client1.get_stations(network=NET,station=STA)
@@ -215,10 +210,10 @@ for iSTA, STA in enumerate(STAS):
     hrs=4*60*60     # Length of data to download
 
     # load group velocity maps
-    map10=loadtxt('R.gv.10.txt'); map15=loadtxt('R.gv.15.txt')
-    map20=loadtxt('R.gv.20.txt'); map25=loadtxt('R.gv.25.txt')
-    map30=loadtxt('R.gv.30.txt'); map35=loadtxt('R.gv.35.txt')
-    map40=loadtxt('R.gv.40.txt')
+    map10=loadtxt('grv_disp/R.gv.10.txt'); map15=loadtxt('grv_disp/R.gv.15.txt')
+    map20=loadtxt('grv_disp/R.gv.20.txt'); map25=loadtxt('grv_disp/R.gv.25.txt')
+    map30=loadtxt('grv_disp/R.gv.30.txt'); map35=loadtxt('grv_disp/R.gv.35.txt')
+    map40=loadtxt('grv_disp/R.gv.40.txt')
 
     #      LOOP OVER ALL EVENTS
     for j in arange((L)):
@@ -230,7 +225,7 @@ for iSTA, STA in enumerate(STAS):
                 s=client2.get_waveforms(NET,STA,LOC,CHA,UTCDateTime(stime[j]),UTCDateTime(stime[j]+hrs))
             else:
                 # access local data
-                s=LF(UTCDateTime(stime[j]))
+                s=LF(UTCDateTime(stime[j]),hrs,path2msd,STA)
 
             # merge waveforms (sometimes downloaded in several segments)
             s.merge()
@@ -255,6 +250,7 @@ for iSTA, STA in enumerate(STAS):
                 continue
 
         except:
+            print('Error loading data... skipping')
             continue
 
         # get some additional parameters
@@ -368,10 +364,9 @@ for iSTA, STA in enumerate(STAS):
 
     # SAVE DATA
     saved(R1cc,R2cc,R1phi,R2phi,loc=str(saveloc))
-
-
-# In[ ]:
-
+# %% markdown
+# # compcalcs.py
+# %% codecell
 """
 Final Orientation Calculation File
 A. Doran and G. Laske
@@ -508,8 +503,4 @@ for iSTA, STA in enumerate(STAS):
 fnet.close()
 fnet2.close()
 
-
-# In[ ]:
-
-
-
+# %% codecell

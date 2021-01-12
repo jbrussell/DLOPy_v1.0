@@ -44,7 +44,7 @@ A. Doran and G. Laske
 # NETWORK CODE    
 NET = "ORCA" # local name 
 # STATION NAME  
-STA=["B01","B02"] # "*" for all stations
+STA=["*"] # "*" for all stations
 # CHANNELS TO ORIENT 
 CHA="BH?" #"BH?"     
 # CHANNEL LOCATION  
@@ -76,6 +76,10 @@ if localcoords==1:
     stala = inventory['stla']
     stalo = inventory['stlo']
     STAS = inventory['station']
+elif localcoords==0:
+    client = Client(wf_client)
+    inventory = client.get_stations(network=NET, station=",".join(STA),channel=CHA, starttime=time1, endtime=time2)
+    STAS = [x.code for x in inventory[0].stations]
 
 ####
 ##
@@ -135,10 +139,6 @@ savecat=1
 isresume = 0
 STA_resume = 'B01'
 # %% codecell
-if localcoords==0:
-    client = Client(wf_client)
-    inventory = client.get_stations(network=NET, station=",".join(STA),channel=CHA, starttime=time1, endtime=time2)
-    STAS = [x.code for x in inventory[0].stations]
 
 STAS
 # %% markdown
