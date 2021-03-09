@@ -59,6 +59,15 @@ if localdata==1:
 ##    
 ####
 
+# CLIENT INFO
+#       Where to download catalog and waveform data
+cat_client="IRIS"       # catalog data
+wf_client="IRIS"        # waveform data
+# Other options according to OBSPY man page:
+# ‘BGR’, ‘EMSC’, ‘ETH’, ‘GEONET’, ‘GFZ’, ‘INGV’, ‘IPGP’, 
+# ‘IRIS’, ‘ISC’, ‘KOERI’, ‘LMU’, ‘NCEDC’, ‘NIEP’, ‘NOA’, 
+# ‘ODC’, ‘ORFEUS’, ‘RESIF’, ‘SCEDC’, ‘USGS’, ‘USP’
+
 # If want to input own station lat and lon 
 localcoords=0
 if localcoords==1:
@@ -86,14 +95,6 @@ elif localcoords==0:
 time1= "2011-12-08T00:00:00" #"2011-12-08T00:00:00"     # Start date
 time2= "2012-12-09T00:00:00" #"2012-12-09T00:00:00"     # End date
 
-# CLIENT INFO
-#       Where to download catalog and waveform data
-cat_client="IRIS"       # catalog data
-wf_client="IRIS"        # waveform data
-# Other options according to OBSPY man page:
-# ‘BGR’, ‘EMSC’, ‘ETH’, ‘GEONET’, ‘GFZ’, ‘INGV’, ‘IPGP’, 
-# ‘IRIS’, ‘ISC’, ‘KOERI’, ‘LMU’, ‘NCEDC’, ‘NIEP’, ‘NOA’, 
-# ‘ODC’, ‘ORFEUS’, ‘RESIF’, ‘SCEDC’, ‘USGS’, ‘USP’
 
 # COORDINATE SYSTEM
 nameconv=2
