@@ -59,6 +59,13 @@ if localdata==1:
 ##    
 ####
 
+# DATE INFO
+# Time frame in which to calculation orientaiton
+#       Must be of form YYYY-MM-DD HH:MM:SS
+
+time1= "2001-12-01T00:00:00" #"2011-12-08T00:00:00"     # Start date
+time2= "2002-11-25T00:00:00" #"2012-12-09T00:00:00"     # End date
+
 # CLIENT INFO
 #       Where to download catalog and waveform data
 cat_client="IRIS"       # catalog data
@@ -87,14 +94,6 @@ elif localcoords==0:
 ####
 ##
 ####
-
-# DATE INFO
-# Time frame in which to calculation orientaiton
-#       Must be of form YYYY-MM-DD HH:MM:SS
-
-time1= "2011-12-08T00:00:00" #"2011-12-08T00:00:00"     # Start date
-time2= "2012-12-09T00:00:00" #"2012-12-09T00:00:00"     # End date
-
 
 # COORDINATE SYSTEM
 nameconv=2
