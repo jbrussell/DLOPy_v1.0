@@ -477,10 +477,17 @@ for iSTA, STA in enumerate(STAS):
     CEN=finval[-1]
     YLIM1=[-10+CEN,10+CEN]
 
+    # Plot symbols colored by frequency
     plt.figure()
     plt.subplot(1,1,1)
     plt.title('DLOPy results '+STA,fontsize=16)
-    plt.plot(R1cc,centerat(R1phi,m=CEN),'x',R2cc,centerat(R2phi,m=CEN),'x')
+    # plt.plot(R1cc,centerat(R1phi,m=CEN),'x',R2cc,centerat(R2phi,m=CEN),'x')
+    plt.plot([0,1],[finval[-1], finval[-1]],'-',linewidth=4,color=(0.8,0.8,0.8),zorder=1)
+    c = np.matlib.repmat([40,35,30,25,20,15,10],R1cc.shape[0],1)
+    sc = plt.scatter(R1cc,centerat(R1phi,m=CEN),c=c,marker='o',cmap=cm.viridis,alpha=0.5,zorder=10)
+    plt.scatter(R2cc,centerat(R2phi,m=CEN),c=c,marker='^',cmap=cm.viridis,alpha=0.5,zorder=10)
+    cbar = plt.colorbar(sc)
+    cbar.set_label('Frequency (mHz)')
     plt.ylabel('BH1 Orientation \n Angle ($^\circ$)',fontsize=16)
     plt.ylim([CEN-180,CEN+180]); plt.xlim([0,1])
     plt.yticks(fontsize=16)
