@@ -21,6 +21,7 @@ RELEASED APRIL 2017
 # from Orient_PF import *
 from pysave.locfuns import *
 from numpy import *
+import numpy.matlib
 import os
 from obspy.clients.fdsn import Client
 import pandas as pd
